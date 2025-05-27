@@ -38,3 +38,13 @@ Trévis Morvany :
 
 Thibault CIMIC (OP) :
     - Yeah that's what I figured : different for each backend. But then if too much different I guess it kind of kill any hope of having performance portability right ? So I guess Kokkos must try to do things in a similar sense cross backend though no ?
+
+Daniel Arndt :
+  - RangePolicy parallel_for is used when you want to execute N independent work items organized in a 1-dimensional index space and you don’t care about scratch space or mapping to the underlying execution model (or an abstraction thereof). The assumption is that all workitems are pretty much all equally expensive (since there is no way indicate to Kokkos which ones might be more expensive). Kokkos::Schedule is only used for host-parallel backends but might help in the case of unbalanced work loads.
+
+Thibault Cimic :
+    - Ok I understand, so yeah Kokkos is great, powerful and works pretty well but not magical to the point where you could (right now) say something like "Kokkos allows the user to get a good chance at reaching performance portability by giving the user tools to express parallelism in one formal way even if this parallelism is somewhat unbalanced" ?
+    It'll be of course then up to the user to provide Kokkos with workitems that are pretty much all equally expensive as you said. And not up to the user to tell Kokkos : "it is unbalanced in this way, you should deal with it by distributing like that" ? (modifié) 
+
+Daniel Arndt:
+    - Yes, something like that. In the end the question still is if any other strategy would perform better. The GPU backends are also scheduling blocks/workgroups dynamically to the execution units mitigating the lack of explicit dynamic scheduling on the Kokkos side (within in a block/workgroup).
